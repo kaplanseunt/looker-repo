@@ -57,7 +57,32 @@ view: order_items {
   dimension: sale_price {
     type: number
     sql: ${TABLE}.sale_price ;;
+
   }
+
+
+
+  dimension: sale_price_tier {
+    type: tier
+    tiers: [5, 20, 50, 100, 500]
+    style: relational
+    sql: ${sale_price} ;;
+
+  }
+
+
+
+#    measure: returning_customer_count {
+#      type: count_distinct
+#      sql: ${user_id} ;;
+#      filters: {
+#        field: count
+#        value:  "is greater than 1"
+#      }
+#   }
+
+
+
 
   # A measure is a field that uses a SQL aggregate function. Here are defined sum and average
   # measures for this dimension, but you can also add measures of many different aggregates.
@@ -65,10 +90,19 @@ view: order_items {
 
   measure: total_sale_price {
     type: sum
-    sql: ${sale_price} ;;  }
+    sql: ${sale_price} ;;
+    value_format_name: usd
+    value_format: "$#,##0.00"
+    }
+
   measure: average_sale_price {
     type: average
     sql: ${sale_price} ;;  }
+
+  measure: total_customer {
+    type: count_distinct
+    sql: ${user_id} ;;
+  }
 
   dimension_group: shipped {
     type: time
@@ -86,6 +120,7 @@ view: order_items {
     # hidden: yes
     sql: ${TABLE}.user_id ;;
   }
+
   measure: count {
     type: count
     drill_fields: [detail*]
@@ -94,15 +129,15 @@ view: order_items {
   # ----- Sets of fields for drilling ------
   set: detail {
     fields: [
-	id,
-	users.last_name,
-	users.id,
-	users.first_name,
-	inventory_items.id,
-	inventory_items.product_name,
-	products.name,
-	products.id
-	]
+  id,
+  users.last_name,
+  users.id,
+  users.first_name,
+  inventory_items.id,
+  inventory_items.product_name,
+  products.name,
+  products.id
+  ]
   }
 
 }
